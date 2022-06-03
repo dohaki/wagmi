@@ -1,13 +1,8 @@
 import * as React from 'react'
 import * as ReactDOM from 'react-dom/client'
 
-import {
-  WagmiConfig,
-  configureChains,
-  createClient,
-  defaultChains,
-} from 'wagmi'
-import { alchemyProvider } from 'wagmi/providers/alchemy'
+import { WagmiConfig, configureChains, createClient } from 'wagmi'
+import { jsonRpcProvider } from 'wagmi/providers/jsonRpc'
 import { CoinbaseWalletConnector } from 'wagmi/connectors/coinbaseWallet'
 import { InjectedConnector } from 'wagmi/connectors/injected'
 import { MetaMaskConnector } from 'wagmi/connectors/metaMask'
@@ -23,11 +18,25 @@ if (!window.Buffer) {
   window.Buffer = Buffer
 }
 
-const alchemyId = process.env.REACT_APP_ALCHEMY_ID
-
-const { chains, provider, webSocketProvider } = configureChains(defaultChains, [
-  alchemyProvider({ alchemyId }),
-])
+const { chains, provider, webSocketProvider } = configureChains(
+  [
+    {
+      name: 'boson',
+      rpcUrls: {
+        default:
+          'https://geth.bsn-development-potassium.bosonportal.io/ac012be65837ebc3134e/rpc',
+      },
+      network: 'boson',
+      id: 1234,
+      ensAddress: '0x7208c5FdF31FCc73CeeeF783F6b160eC1a5F18c3',
+    },
+  ],
+  [
+    jsonRpcProvider({
+      rpc: (chain) => ({ http: chain.rpcUrls.default }),
+    }),
+  ],
+)
 
 const client = createClient({
   autoConnect: true,
